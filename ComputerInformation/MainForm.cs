@@ -11,12 +11,13 @@ using System.DirectoryServices;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Timers;
 
 namespace ComputerInformation
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        public Form1()
+        public MainForm()
         {
             string ipAdd = string.Empty;
 
@@ -28,18 +29,25 @@ namespace ComputerInformation
 
             computerInfoNotifyIcon.Text = Convert.ToString(ipAddressLabel.Text +
                 "\n" + computerNameLabel.Text);
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            System.Windows.Forms.Timer refreshTimer = new System.Windows.Forms.Timer();
+            refreshTimer.Interval = 60000;// 60 seconds
+            refreshTimer.Tick += new System.EventHandler(Refresh_Tick);
+            refreshTimer.Start();
+
             this.Location = new Point(Screen.PrimaryScreen.Bounds.Right - this.Width, 0);
             this.TransparencyKey = BackColor;
             this.ShowInTaskbar = false;
 
             this.Visible = false;
-            
+        }
+        private void Refresh_Tick(object sender, EventArgs e)
+        {
+            //do whatever you want 
+            GetSystemInfo();
         }
 
         public void GetSystemInfo()
@@ -85,8 +93,6 @@ namespace ComputerInformation
             computerNameLabel.Text = Environment.MachineName;
             didLabel.Text = ADPhoneNumber();
             extensionLabel.Text = ADExtension();
-
-            
         }
 
         public static DateTime GetPasswordExpirationDate(string userId, string domainOrMachineName)
